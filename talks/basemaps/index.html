@@ -1,0 +1,407 @@
+<!doctype html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+
+		<title>CartoDB basemaps</title>
+
+		<meta name="description" content="A framework for easily creating beautiful presentations using HTML">
+		<meta name="author" content="Hakim El Hattab">
+
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+
+		<link rel="stylesheet" href="css/reveal.css">
+		<link rel="stylesheet" href="css/theme/cartodb.css" id="theme">
+
+		<!-- Code syntax highlighting -->
+		<link rel="stylesheet" href="lib/css/zenburn.css">
+
+		<!-- Printing and PDF exports -->
+		<script>
+			var link = document.createElement( 'link' );
+			link.rel = 'stylesheet';
+			link.type = 'text/css';
+			link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+			document.getElementsByTagName( 'head' )[0].appendChild( link );
+		</script>
+
+		<!--[if lt IE 9]>
+		<script src="lib/js/html5shiv.js"></script>
+		<![endif]-->
+	</head>
+
+	<body>
+
+		<div class="reveal">
+
+			<!-- Any section element inside of this container is displayed as a slide -->
+			<div class="slides">
+				<section>
+					<h2>CartoDB Basemaps</h2>
+					<h3>A tale of data, tiles, and dark matter sandwiches</h3>
+					<p>
+          <h4>Alejandro Martínez, Systems Engineer<br>@iamzenitraM - alejandro@cartodb.com</h4>
+					</p>
+				</section>
+
+				<section>
+					<h3>
+          This is the story of how an evening hack of a cofounder got us into serving basemaps.
+					</h3>
+				</section>
+        <section data-background="img/leapfrog.jpg"></section>
+				<section>
+					<h2>Pushing our own limits</h2>
+					<p>
+						We love building CartoDB using CartoDB:
+            <ul>
+              <li>Open-data based Geocoding is SQL functions on a public account queried over the SQL API</li>
+              <li>Data library datasets are fetched from the visualization list on an account</li>
+              <li>More internal APIs (metrics, analysis) are backed by the SQL API</li>
+            </ul>
+					</p>
+				</section>
+				<section>
+					<h2>What is a basemap, anyway?</h2>
+					<p>
+					  Layers of data (<i>for us, open data</i>) with a matching style.
+          </p>
+          <p>So it made sense to try build some basemaps using CartoDB itself.</p>
+				</section>
+
+				<section>
+					<h2>Hacking ourselves</h2>
+					<p>
+          CartoDB was not designed as a basemap platform.
+          </p>
+          <p>
+          Even though our stack is based on components widely used for basemaps (as Mapnik) we're more optimized on <i>smaller amounts of data</i> that changes dynamically.
+					</p>
+				</section>
+
+
+        <section data-background="img/ne-all-things.jpg" data-background-size='contain'>
+        </section>
+
+        <section data-background="img/editor_screenshot.png" data-background-size='contain'>
+        </section>
+        <section data-background="img/map_css_editing.png" data-background-size='contain'>
+        </section>
+        <section data-background="img/map_css_editing.png" data-background-size='contain'>
+						<div style="background-color: rgba(0, 0, 0, 0.9); color: #fff; padding: 20px;">
+					<h2>The first basemap attempt</h2>
+					<p>
+          The <i>eco, antique, midnight commander</i> basemaps are actually CartoDB visualizations.
+					</p>
+					<p>This helped us find limitations on the CartoDB editor:</p>
+          <ul>
+            <li>Number of layers (the UI does not scale)</li>
+            <li>Dataset size (the importer, ogr2ogr based, takes too long to import the whole OSM)</li>
+            <li>Custom SQL limits</li>
+          </ul>
+            </div>
+				</section>
+      <section>
+        <h2>but, after all, it was simple to make it work</h2>
+          nginx rules to rewrite
+          <code><pre>
+http://1.api.cartocdn.com/base-flatblue/1/1/1.png
+        </pre></code>
+        to
+          <code><pre>
+http://1.api.cartocdn.com/basemaps/api/v1/map/924d16...5/1/1/1.png
+        </pre></code>
+        </ul>
+      </section>
+
+      <section>
+        <h2>Achievement unlocked</h2>
+        The antique, flat blue, greeny.. were our our first attempt to basemaps.
+        But we could go a little further.
+      </section>
+      <section>
+        <h2>Going a step further</h2>
+        <p>We started offering <i>unlimited mapviews</i>, but we felt that there was not any free</p>
+        <ul><li>OSM-based basemap,</li>
+          <li>without usage limits,</li>
+          <li>and suited for data visualization overlays</li>
+        </ul>
+      </section>
+
+				<section>
+					<h2>Crossing the OSM limits</h2>
+					<p>Omniscale helped us importing the whole OSM inside CartoDB, with Imposm3 and a mapping that made sense for our purpose:
+        <a href="https://github.com/CartoDB/osm">https://github.com/CartoDB/osm</a>
+        <ul>
+          <li>HStore storing OSM tags</li>
+          <li>Single table with all geometries:
+            <pre><code>select * from planet</code></pre></li>
+        </ul></p>
+				</section>
+        <section data-background="img/bgbase.png">
+            <div style="background-color: rgba(0, 0, 0, 0.7); color: #fff; padding: 20px;">
+					<h2>...and the matter limits</h2>
+          <p>Stamen helped us designing two awesome opensource maps envisioned for <b>data visualization</b></p>
+          <p>(oh, and they're also open source)</p>
+        <a href="https://github.com/Stamen/cartodb-basemaps">https://github.com/Stamen/cartodb-basemaps</a>
+            </div>
+				</section>
+				<section>
+          <!--<h2>some <strike>hacks</strike> magic dust</h2>-->
+          PostgreSQL materialized views with simplified versions for high zooms of OSM data
+          <pre><code>CREATE OR REPLACE FUNCTION generalize(geom geometry, zoom int) RETURNS geometry
+AS $$
+BEGIN
+  -- generalize to 1/4 pixel (assuming 256x256 tiles)
+  RETURN ST_Simplify(geom, 20037508.34 * 2 / 2^(9 + zoom));
+END
+$$ LANGUAGE plpgsql IMMUTABLE;</code></pre>
+          <pre><code>CREATE MATERIALIZED VIEW foo.highroad_z14 AS 
+SELECT generalize(the_geom_webmercator, 14) AS the_geom_webmercator, highway,
+        railway, (CASE WHEN highway IN ('motorway', 'motorway_link') THEN 'highway'
+                 WHEN highway IN ('trunk', 'trunk_link', 'primary', 'primary_link',
+               'secondary', 'secondary_link', 'tertiary', 'tertiary_link') 
+THEN 'major_road'</code></pre>
+
+          Can be refreshed on PostgreSQL 9.4 with:
+          <pre><code>REFRESH MATERIALIZED VIEW foo.highroad_z14 CONCURRENTLY;</code></pre>
+        </section>
+				
+        <section>
+          <!--<h2>some <strike>hacks</strike> magic dust</h2>-->
+          PostgreSQL functions to use one table or another depending on the zoom:
+          <pre><code>DROP FUNCTION IF EXISTS tunnels(schema text, scaleDenominator text, bbox box3d);
+CREATE OR REPLACE FUNCTION tunnels(schema text, scaleDenominator text, bbox box3d)
+(...)
+  CASE
+    WHEN zoom(scaleDenominator::numeric) = 13 
+      THEN tablename := 'highroad_z13';
+(...)
+  RETURN QUERY EXECUTE format(
+    'SELECT the_geom_webmercator, highway::text, railway::text, kind::text, is_link::text, is_tunnel::text, is_bridge::text
+     FROM %s.%I
+     WHERE the_geom_webmercator && $1
+      AND is_tunnel = ''yes'' ORDER BY z_order ASC', schema, tablename
+  ) USING bbox;
+END
+$$
+LANGUAGE 'plpgsql';</pre></code>
+
+				</section>
+
+				<section>
+						<h2>Development and styling process</h2>
+          First iteration was using Tilemill.
+          But once you have the desired layers, the maps API makes things easy: just change the style, POST it, refresh.</li>
+            </ul>
+          </p>
+				</section>
+
+				<section>
+						<h2>The next level: Atom basemap editor</h2>
+https://atom.io/packages/cartodb
+				</section>
+				<section>
+						<h2>Mix your own data with our own basemaps!</h2>
+            <ul>
+              <li>Edit polygons directly from the CartoDB editor or the SQL API</li>
+              <li>Use them inside your basemap: as masks, overlays, etc</li>
+              <li>Our caching/invalidation mechanisms will ensure to keep it updated</li>
+            </ul>
+
+				</section>
+				<section>
+						<h2>Sandwiches!</h2>
+				</section>
+        <section data-background="img/no-sandwich.png" data-background-size='contain'>
+        </section>
+        <section data-background="img/sandwich.png" data-background-size='contain'>
+        </section>
+        <section data-background="img/sandwich.png" data-background-size='contain'>
+            <div style="background-color: rgba(0, 0, 0, 0.9); color: #fff; padding: 20px;">
+          <h2>Labels on top</h2>
+          <p>Styling issues:</p>
+          <ul>
+            <li>Need to add shadows to work with any kind of data colors</li>
+            <li>Readjust the labels to display less data</li>
+          </ul>
+            </div>
+        </section>
+
+
+				<section>
+						<h2>There are sandwiches all over your stack!</h2>
+				</section>
+
+        <section data-background="img/mapsapi.png" data-background-size='contain'>
+        </section>
+        <section data-background="img/mapsapimask.png" data-background-size='contain'>
+        </section>
+				<section>
+						<h2>"Sandwich mode" on the Maps API</h2>
+            <p>You can request Mapnik layers to be blended with:</p>
+              <ul><li>any HTTP-servable basemap</li>
+                <li>a Torque layer (which is rendered server-side)</li>
+              </ul>
+              <pre><code>
+{  
+   "layers":[  
+      {  
+         "type":"http",
+         "options":{  
+            "urlTemplate":"http://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}.png",
+            "subdomains":"abcd"
+         }
+      },
+      {  
+         "type":"named",
+         "options":{  
+            "name":"tpl_bf83fa1c_4ca9_11e5_a075_0e43f3deba5a"
+         }
+      },
+      {  
+         "type":"http",
+         "options":{  
+            "urlTemplate":"http://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}.png",
+            "subdomains":"abcd"
+         }
+      }
+   ]
+}
+              </code></pre>
+				</section>
+        
+      <section data-transition="none">
+              ..and you are no longer restricted to only request XYZ tiles:
+
+              <pre><code>
+https://cartocdn-ashbu.global.ssl.fastly.net/zenitram/api/v1/map/static/
+  center/5e6fdf9c51778eef474e60f5b29fe142:1435919147332.14
+/13 #zoom
+/40.75388918270174/-73.95240783691405 #coords
+/300/170.png #map size
+            </code></pre>
+            <img src="img/small-static.png">
+      </section>
+        
+      <section data-transition="none">
+						<h2></h2>
+              ..and you are no longer restricted to only request XYZ tiles:
+
+              <pre><code>
+https://cartocdn-ashbu.global.ssl.fastly.net/zenitram/api/v1/map/static/
+  center/5e6fdf9c51778eef474e60f5b29fe142:1435919147332.14/
+/14 #zoom
+/40.75388918270174/-73.95240783691405 #coords
+/300/170.png #map size
+            </code></pre>
+            <img src="img/big-static.png">
+      </section>
+
+				<section>
+						<h2>Load testing came to optimizations</h2>
+						<h3>(that ended up extending to the whole CartoDB)</h3>
+				</section>
+				<section>
+						<h2>Metatiling</h2>
+						<h4>A tiler server renders a tile and its adjacent neighbors:</h4>
+            <img src="img/metatile.png">
+				</section>
+				<section>
+            <h3>Metatiling is handled by Windshaft (and tilelive-mapnik) on an internal cache</h3>
+            When you request a tile, it will generate the adjacent ones and store them until needed
+				</section>  
+        <section data-background='img/cloudschema.png' data-background-size='contain'></section>
+				<section>
+            <h3>But how can we use it with more than one tiler?</h3>
+            <h4>Default routing is round-robin, random</h4>
+            <h4>All tilers would end up rendering more than needed</h4>
+				</section>  
+				<section>
+            <h3>Consistent hashing</h3>
+            <h4>Each request is assigned a key, which is used to always balance it to the same server</h4>
+            (and, if an upstream server goes down, traffic is gracefully redistributed to other ones)
+				</section>  
+      <section>
+        <h4>Nginx + Lua:</h4>
+        <pre><code>
+local m = ngx.re.match(ngx.var.uri, "map/(.*)/(\\d+)/(\\d+)
+  /(\\d+)\\.(png|grid\\.json|json\\.torque)")
+if m then
+  local id = m[1]
+  local tile_z = m[2]
+  local tile_x = m[3]
+  local tile_y = m[4]
+  local metatile_level = 2
+  ngx.var.balance_hash = id .. '.' .. tile_z .. '.' .. 
+      (bit.lshift(tile_x - tile_x % metatile_level, tile_z) +
+      (tile_y - tile_y % metatile_level))
+  ngx.header["X-CDBM"] = ngx.var.balance_hash
+end
+      </pre></code>
+        </section>
+				<section>
+						<h2>Squeezing all performance!</h2>
+				</section>
+      <section data-background='img/wkb.png' data-background-size='contain'>
+						<div style="background-color: rgba(0, 0, 0, 0.9); color: #fff; padding: 20px;">
+					<h3>
+~ 2.17004006 × 10-10 centimeters precision
+          </h3></div></section>
+      <section>
+        <h2>TWKB format</h2>
+        <h4>(Tiny Well Known Binary)</h4>
+        <a href="https://github.com/TWKB/Specification/blob/master/twkb.md">https://github.com/TWKB/Specification/blob/master/twkb.md</a>
+        <ul>
+          <li>Equivalent to WKB</li>
+          <li>Delta encoding</li>
+          <li>Varint precision</li>
+        </ul>
+      </section>
+
+      <section>
+        <img src="img/twkb-net-drop.png">
+      </section>
+
+      <section>
+        <h3>Thank you!</h3>
+        <h4>Questions?</h4>
+      </section>
+			</div>
+
+		</div>
+
+		<script src="lib/js/head.min.js"></script>
+		<script src="js/reveal.js"></script>
+
+		<script>
+
+			// Full list of configuration options available at:
+			// https://github.com/hakimel/reveal.js#configuration
+			Reveal.initialize({
+				controls: true,
+				progress: true,
+				history: true,
+				center: true,
+
+				transition: 'slide', // none/fade/slide/convex/concave/zoom
+
+				// Optional reveal.js plugins
+				dependencies: [
+					{ src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
+					{ src: 'plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/highlight/highlight.js', async: true, condition: function() { return !!document.querySelector( 'pre code' ); }, callback: function() { hljs.initHighlightingOnLoad(); } },
+					{ src: 'plugin/zoom-js/zoom.js', async: true },
+					{ src: 'plugin/notes/notes.js', async: true }
+				]
+			});
+
+		</script>
+
+	</body>
+</html>
