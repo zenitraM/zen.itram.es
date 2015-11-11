@@ -1,0 +1,334 @@
+<!doctype html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+
+		<title>Taking dynamic web mapping to 1:100000 scale</title>
+
+		<meta name="description" content="A framework for easily creating beautiful presentations using HTML">
+		<meta name="author" content="Hakim El Hattab">
+
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+
+		<link rel="stylesheet" href="css/reveal.css">
+		<link rel="stylesheet" href="css/theme/cartodb.css" id="theme">
+
+		<!-- Code syntax highlighting -->
+		<link rel="stylesheet" href="lib/css/zenburn.css">
+
+		<!-- Printing and PDF exports -->
+		<script>
+			var link = document.createElement( 'link' );
+			link.rel = 'stylesheet';
+			link.type = 'text/css';
+			link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+			document.getElementsByTagName( 'head' )[0].appendChild( link );
+		</script>
+
+		<!--[if lt IE 9]>
+		<script src="lib/js/html5shiv.js"></script>
+		<![endif]-->
+	</head>
+
+	<body>
+
+		<div class="reveal">
+
+			<!-- Any section element inside of this container is displayed as a slide -->
+			<div class="slides">
+				<section>
+					<h2>Taking dynamic web mapping to 1:100000 scale</h2>
+					<p>
+          <small>Alejandro Martínez, Systems Engineer<br>@iamzenitraM - alejandro@cartodb.com</small>
+					</p>
+				</section>
+
+				<section>
+					<h2>Taking dynamic web mapping to 1:130000 scale</h2>
+					<p>
+          <small>Alejandro Martínez, Systems Engineer<br>@iamzenitraM - alejandro@cartodb.com</small>
+					</p>
+				</section>
+
+				<section>
+					<h3>
+          130,000 users creating maps
+					</h3>
+        </section>
+
+        <section data-background="img/cdb_dashboard.png">
+        </section>
+        <section data-background="img/cdb_dashboard.png">
+            <div style="background-color: rgba(0, 0, 0, 0.9); color: #fff; padding: 20px;">
+          <h2>The CartoDB editor</h2>
+          <p>
+          Ruby on Rails interface to manage, create visualizations...
+          </p>
+            </div>
+        </section>
+        <section data-background="img/cdb_dashboard.png">
+            <div style="background-color: rgba(0, 0, 0, 0.9); color: #fff; padding: 20px;">
+          <h2>which sits on top of the CartoDB platform:</h2>
+          <h3>
+            </div>
+        </section>
+        <section>
+          <h2>The maps API</h2>
+          <p>Send SQL + CSS &#8594; Get tiles</p>
+          <pre><code data-trim>
+{
+  "version": "1.3.0",
+  "layers": [{
+    "type": "mapnik",
+    "options": {
+      "cartocss_version": "2.1.1", 
+      "cartocss": "#layer { polygon-fill: #FFF; }",
+      "sql": "select * from european_countries_e",
+      "interactivity": ["cartodb_id", "iso3"]
+    }
+  }]
+  }
+        </code></pre>
+        <div class='fragment'>
+          with a <code>curl</code> or <a href="http://docs.cartodb.com/cartodb-platform/cartodb-js.html">CartoDB.core.js</a> results in
+          <code><pre>
+http://1.api.cartocdn.com/zenitram/api/v1/map/924d16e05590c734e4c5cf2501609f45:1412343237772.65/0/{z}/{x}/{y}.png
+        </pre></code></div>
+      </section>
+        <section>
+          <h2>The SQL API</h2>
+          <p>Send SQL &#8594; Get result</p>
+          <pre><code data-trim>
+{
+q: "SELECT * FROM my_table",
+format: "csv"
+  }
+        </code></pre>
+        <div class='fragment'>        results in
+         results in
+          <code><pre>
+cartodb_id,a,b,the_geom
+1,foo,bar,0101000020E61000006EBF7CB262B8CCBFB3B112F3ACE04340
+        </pre></code></div>
+      </section>
+
+      <section>
+        <h2>everything is <u>free</u> software:</h2>
+        (you can set up your own)
+        <ul>
+          <li>editor: CartoDB (Rails)</li>
+          <li>maps API: Windshaft (w/ Mapnik, Torque)</li>
+          <li>SQL API: node-sql-api</li>
+          <li>database: PostgreSQL + PostGIS</li>
+          <li>client-side: CartoDB.js (based on Leaflet)</li>
+        </ul>
+        <h2>..but we will host it for you</h2>
+      </section>
+
+
+      <section data-background='img/clouds.jpg'>
+						<div style="background-color: rgba(0, 0, 0, 0.4); color: #fff; padding: 20px;">
+					<h3>
+          the cloud
+          </h3></div>
+        </section>
+
+      <section data-background='img/scale.jpg' data-background-size='contain'></section>
+
+
+				<section>
+          <h3>in 3 years, we've gone from a couple dedicated servers to managing:</h3>
+          <ul>
+            <li>EC2 multiple clouds</li>
+            <li>GCE multiple clouds</li>
+            <li>dedicated instances</li>
+            <li>on-premise instances</li>
+          </ul>
+            <h3>hundreds of computer machinery hosting CartoDB</h3>
+        </section>
+      <section data-background='img/cloudschema.png' data-background-size='contain'></section>
+				<section>
+					<h3>
+          and not everything is as simple as adding more machines...
+					</h3>
+        </section>
+
+				<section>
+					<h2>
+          fitting a lot of crickets in a box.
+					</h2>
+          a.k.a PostgreSQL multitenancy
+        </section>
+
+      <section>
+				
+        <h3>User behavior is "unbounded":</h3>
+          <ul>
+            <li>They can run any SQL query</li>
+            <li>They can use any (unoptimized) dataset how they want</li>
+            <li>That sometimes might not make sense, but that's the price to pay for freedom</li>
+          </ul>
+      </section>
+      <section>
+				
+        <strike>Metric all the things</strike><br>
+          Keeping track of everything:
+          <p>
+          <ul>
+            <li>Nagios</li>
+            <li>Ganglia</li>
+            <li>Graphite</li>
+            <li>Logstash</li>
+            <li>Elasticsearch</li>
+          </ul>
+          </p>
+      </section>
+				<section>
+					<h2>
+          Our database clusters have hundreds of PostgreSQL databases each.
+					</h2>
+          ...making administrative tasks complicated.
+        </section>
+      <section data-background='img/postgis_upgrade.png' data-background-size='contain'></section>
+      <section data-background='img/postgis_upgrade.png' data-background-size='contain'>
+						<div style="background-color: rgba(0, 0, 0, 0.9); color: #fff; padding: 20px;">
+					<h3>
+          x 130,000 times.
+          </h3></div></section>
+      <section data-background='img/db_loader.png' data-background-size='contain'></section>
+      <section data-background='img/db_loader2.png' data-background-size='contain'></section>
+
+				<section>
+					<h2>
+          CPU and IO are not your only bottleneck
+					</h2>
+        </section>
+        <section>
+					<table>
+						<thead>
+						</thead>
+						<tbody>
+							<tr>
+                <td><img src="img/tile1.png"></td>
+                <td><img src="img/tile2.png"></td>
+							<tr>
+							<tr>
+								<td>116 bytes to the browser</td>
+								<td>2kbytes to the browser</td>
+							<tr class='fragment'>
+								<td>25 megabytes from the database</td>
+								<td>25 megabytes from the database</td>
+							<tr>
+							<tr>
+						</tbody>
+					</table>
+        </section>
+      <section data-background='img/peaks.png' data-background-size='contain'></section>
+				<section>
+					<h2>
+          WKB is used as geometry transport format by default
+					</h2>
+        </section>
+      <section data-background='img/wkb.png' data-background-size='contain'></section>
+      <section data-background='img/wkb.png' data-background-size='contain'>
+						<div style="background-color: rgba(0, 0, 0, 0.9); color: #fff; padding: 20px;">
+					<h3>
+~ 2.17004006 × 10-10 centimeters precision
+          </h3></div></section>
+      <section>
+        <ul>
+          <li>We have no need to transfer the whole precision (we only need subpixel precision)</li>
+          <li>We don't also need to transfer the whole geometry</li>
+        </ul>
+      </section>
+      <section>
+        <h2>TWKB format</h2>
+        <h4>(Tiny Well Known Binary)</h4>
+        <a href="https://github.com/TWKB/Specification/blob/master/twkb.md">https://github.com/TWKB/Specification/blob/master/twkb.md</a>
+        <ul>
+          <li>Equivalent to WKB</li>
+          <li>Delta encoding</li>
+          <li>Varint precision</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>TWKB dropped our traffic to 10%.</h2>
+        <img src="img/twkb-net-drop.png">
+      </section>
+      <section>
+        <h4>Available on PostGIS 2.2, our fork of Mapnik (github.com/cartodb/mapnik)</h4>
+      </section>
+
+      <section>
+        <h2>Caching</h2>
+      </section>
+      <section>
+        <h3>A big percentage of the data uploaded to CartoDB is never changed.</h3>
+        <h4>(but, when it is, it changes widely)</h4>
+      </section>
+      <section data-background='img/cdngra.png' data-background-size='contain'></section>
+      <section data-background='img/fastly.png' data-background-size='contain'></section>
+      <section>
+        <h3>"There are only two hard problems in Computer Science: cache invalidation and naming things."</h3>
+      </section>
+      <section data-background='img/varnishtis.png' data-background-size='contain'>
+						<div style="background-color: rgba(0, 0, 0, 0.8); color: #fff; padding: 20px;">
+        <h3>We use database PL/Python triggers to invalidate Varnish caches</h3>
+      </section>
+      <section>
+						<div style="background-color: rgba(0, 0, 0, 0.8); color: #fff; padding: 20px;">
+        <h3>but this did not offer us enough flexibility</h3>
+      </section>
+      <section data-background='img/tis.png' data-background-size='contain'></section>
+      <section>
+				
+        <h3>with:
+          <ul>
+            <li>Bounding box invalidation</li>
+            <li>Synchronous / Asynchronous invalidation</li>
+            <li>more features (and free release) coming soon</li>
+          </ul>
+        </h3>
+      </section>
+      <section>
+        <h3>Thank you!</h3>
+        <h4>Questions?</h4>
+      </section>
+			</div>
+		</div>
+
+		<script src="lib/js/head.min.js"></script>
+		<script src="js/reveal.js"></script>
+
+		<script>
+
+			// Full list of configuration options available at:
+			// https://github.com/hakimel/reveal.js#configuration
+			Reveal.initialize({
+				controls: true,
+				progress: true,
+				history: true,
+				center: true,
+
+				transition: 'slide', // none/fade/slide/convex/concave/zoom
+
+				// Optional reveal.js plugins
+				dependencies: [
+					{ src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
+					{ src: 'plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/highlight/highlight.js', async: true, condition: function() { return !!document.querySelector( 'pre code' ); }, callback: function() { hljs.initHighlightingOnLoad(); } },
+					{ src: 'plugin/zoom-js/zoom.js', async: true },
+					{ src: 'plugin/notes/notes.js', async: true }
+				]
+			});
+
+		</script>
+
+	</body>
+</html>
