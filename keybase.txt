@@ -1,0 +1,56 @@
+==================================================================
+https://keybase.io/zenitram
+--------------------------------------------------------------------
+
+I hereby claim:
+
+  * I am an admin of https://zen.itram.es
+  * I am zenitram (https://keybase.io/zenitram) on keybase.
+  * I have a public key ASAGQMzw9dyaq2UkVL_h6byskFJzzLdmIwyV1KiXo-XCfgo
+
+To do so, I am signing this object:
+
+{
+  "body": {
+    "key": {
+      "eldest_kid": "01019458cf9aacb8c3088b7b38a0de036c645977d94b1e5895a96dcd30f1f054dee60a",
+      "host": "keybase.io",
+      "kid": "01200640ccf0f5dc9aab652454bfe1e9bcac905273ccb766230c95d4a897a3e5c27e0a",
+      "uid": "cc1748c4b4cdbcd92ced89f9cc3fa100",
+      "username": "zenitram"
+    },
+    "merkle_root": {
+      "ctime": 1524483476,
+      "hash": "e4bd3e663e78a5683a937bd9760a0493923c53bb2b0ad15df692308a0a27112fe8416ba6272ecb483d71f8abf6c10fb178808b9e4211af3f780d09237a0c03b8",
+      "hash_meta": "7bff6f6e1f95519bea790e219d6b096ee2c14a2057ab3f059da6ca8a3da1b7ee",
+      "seqno": 2429005
+    },
+    "service": {
+      "entropy": "2+AcDaulH2p0HaXw6qfdy6/N",
+      "hostname": "zen.itram.es",
+      "protocol": "https:"
+    },
+    "type": "web_service_binding",
+    "version": 2
+  },
+  "client": {
+    "name": "keybase.io go client",
+    "version": "1.0.47"
+  },
+  "ctime": 1524483484,
+  "expire_in": 504576000,
+  "prev": "cb3ee60c21197c643d6f95ae5e86ad9d49f071dd5824c4edd3e544c8b70167c1",
+  "seqno": 50,
+  "tag": "signature"
+}
+
+which yields the signature:
+
+hKRib2R5hqhkZXRhY2hlZMOpaGFzaF90eXBlCqNrZXnEIwEgBkDM8PXcmqtlJFS/4em8rJBSc8y3ZiMMldSol6Plwn4Kp3BheWxvYWTESpcCMsQgyz7mDCEZfGQ9b5WuXoatnUnwcd1YJMTt0+VEyLcBZ8HEIFkKQKt4I7O+9tigJoDHc6UnpKRnUO5VS6RRTlLGRQNJAgHCo3NpZ8RAAttTldcSdjQvTGN5U+Ij7GuKpHD+Vn0nblvuheWR1Iye5ajrFSt8pKZFbPDDcCh6u+2oWEVKY6CoV0r3QGwlCKhzaWdfdHlwZSCkaGFzaIKkdHlwZQildmFsdWXEIOz5IlOr0P2D1xY6YVBbLxe8WlKCPpnfE1/XxJoUfevDo3RhZ80CAqd2ZXJzaW9uAQ==
+
+And finally, I am proving ownership of this host by posting or
+appending to this document.
+
+View my publicly-auditable identity here: https://keybase.io/zenitram
+
+==================================================================
